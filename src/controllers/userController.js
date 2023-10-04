@@ -1,3 +1,4 @@
+import { createToken } from "../config/jwt.js";
 import sequelize from "../models/connect.js";
 import initModels from "../models/init-models.js";
 
@@ -32,4 +33,24 @@ const addUser = async (req, res) => {
   await modal.users.create(newUser);
   res.send("Tạo tài khoản thành công!!!");
 };
-export { getUser, addUser };
+
+const userLogin = async (req, res) => {
+  let { email, password } = req.body;
+  let checkEmail = await modal.users.findOne({
+    where: {
+      email: email,
+    },
+  });
+  if (checkEmail) {
+    if (password == checkEmail.password) {
+      let token = createToken({ checkEmail, password: "" });
+      console.log(checkEmail)
+      res.send(token)
+    } else {
+      res.send("Sai mật khẩu!!")
+    }
+  }else {
+    res.send("Sai email!!!")
+  }
+};
+export { getUser, addUser, userLogin };
