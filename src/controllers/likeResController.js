@@ -1,4 +1,3 @@
-
 import { decodeToken } from "../config/jwt.js";
 import sequelize from "../models/connect.js";
 import initModels from "../models/init-models.js";
@@ -31,28 +30,27 @@ const likeOrDislike = async (req, res) => {
   let { token } = req.headers;
 
   let userLogin = decodeToken(token);
-  let {users_id} = userLogin.data.checkEmail
+  let { users_id } = userLogin.data.checkEmail;
 
   let checkLike = await model.like_res.findAll({
-    where:{
+    where: {
       users_id: users_id,
-      res_id: resId
+      res_id: resId,
     },
-  })
-  if(checkLike.length == 0) {
+  });
+  if (checkLike.length == 0) {
     let newData = {
       users_id: users_id,
       res_id: resId,
-      date_like : new Date()
-    }
-    await model.like_res.create(newData)
-    res.send("Like thành công!!!")
-  };
+      date_like: new Date(),
+    };
+    await model.like_res.create(newData);
+    res.send("Like thành công!!!");
+  }
   if (checkLike.length != 0) {
-    await model.like_res.destroy({where:{users_id}})
-    res.send("Đã dislike !!!")
+    await model.like_res.destroy({ where: { users_id, res_id: resId } });
+    res.send("Đã dislike !!!");
   }
 };
-
 
 export { getLike, getListLikeByRes, getListLikeByUser, likeOrDislike };
